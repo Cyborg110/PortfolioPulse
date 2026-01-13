@@ -1,0 +1,118 @@
+Модуль candles — единая точка работы со свечными данными всех инструментов проекта.
+Содержит всё необходимое для загрузки, хранения, обновления и расчёта метрик по историческим ценам.
+
+Структура модуля
+├── models.py          → основные классы Candle, Candles, MultiTimeframeCandles
+├── database.py        → работа с SQLite-таблицами candles_1h и candles_1d (не описывается здесь)
+└── __init__.py        → re-export нужных классов
+
+Главные классы
+1. Candle
+   Простейший контейнер одной свечи. Хранит open, high, low, close, volume, time.
+   При создании автоматически умножает цены на factor (используется в облигациях: nominal/100).
+
+2. Candles (бывший CandlesBase)
+   Работа с одним таймфреймом (день или час).
+   Ключевые поля:
+   - self.candles          → список объектов Candle (буфер)
+   - self.last_candle      → последняя свеча (всегда хранится отдельно, даже если буфер пуст)
+   - volatility, avg_volume, avg_price_volume, average_return,
+     sharpe_ratio, max_drawdown, atr_14  → кэшированные статичные метрики
+
+   Важно: все метрики рассчитываются ТОЛЬКО по свечам, которые находятся в self.candles
+   (то есть по текущему содержимому буфера).
+
+3. MultiTimeframeCandles
+   Обёртка, которая сразу создаёт два объекта Candles:
+   - CandleInterval.CANDLE_INTERVAL_HOUR
+   - CandleInterval.CANDLE_INTERVAL_DAY
+
+   Доступ:
+   candles = MultiTimeframeCandles(figi="BBG004730N88", factor=1)
+   candles[CandleInterval.CANDLE_INTERVAL_DAY]   → объект Candles (дневки)
+   candles[CandleInterval.CANDLE_INTERVAL_HOUR] → объект Candles (часовки)
+
+   Также реализованы магические методы:
+   candles.price, candles.volatility и т.д. → автоматически берутся из дневного таймфрейма
+   (это удобно в Stock/Etf/Bond, где почти всегда нужны именно дневные метрики).
+
+Работа с буфером (самое важное!)
+
+По умолчанию буфер пустой. Метрики НЕ будут посчитаны, пока вы явно не загрузите свечи.
+
+Способы заполнить буфер:
+
+1. load_candles(from_date=None, to_date=None)
+   Если даты не указаны — берёт «стандартный» период из Settings.Candles.DEFAULT_LOAD_DAYS:
+   - дневки  → последние 5 лет (1825 дней)
+   - часовки → последние 365 дней
+
+2. calculate_static(use_buffer=False)
+   Если use_buffer=False (по умолчанию) →
+        сначала делает load_candles() с дефолтными периодами,
+        потом считает все метрики,
+        потом очищает буфер (clear_buffer()).
+   Это режим, который используют почти все best_*-функции.
+
+   Если use_buffer=True →
+        считает метрики по тем свечам, которые уже лежат в self.candles,
+        буфер НЕ очищается после расчёта.
+        Именно этот режим используется при конвертации валют (converter.py),
+        когда нужно быстро пересчитать цены по уже загруженным свечам.
+
+3. Ручная загрузка любого диапазона (самый гибкий способ)
+   candles = MultiTimeframeCandles(figi=...)
+   await candles[CandleInterval.CANDLE_INTERVAL_DAY].load_candles(
+       from_date=datetime(2015, 1, 1),
+       to_date=datetime(2024, 11, 1)
+   )
+   candles.calculate_static(use_buffer=True)   # метрики посчитаются по вашему диапазону
+
+   После этого буфер останется заполненным — можно ещё раз вызвать calculate_static(use_buffer=True)
+   или использовать свечи для собственных расчётов.
+
+Обновление данных
+
+await candles.update_candles(from_time=None, sleep=0)
+Делает update_candles() для обоих таймфреймов подряд.
+Если from_time=None — берёт дату первой доступной свечи из базы (поле first_1day_candle_date и т.п.).
+
+Полезные методы Candles
+
+- get_candle_by_date(date)        → ближайшая свеча ≤ date (используется в converter и купонах)
+- clear_buffer()                  → очищает self.candles (освобождает память)
+- drop()                          → полностью удаляет все свечи инструмента из БД
+
+Рекомендации по использованию
+
+1. Если вам нужны «стандартные» метрики (volatility, sharpe и т.д.) — просто вызывайте
+   asset.candles.calculate_static()   # use_buffer=False по умолчанию
+   Это самый простой и самый часто используемый способ.
+
+2. Если делаете массовую конвертацию валют или свои сложные расчёты — сначала загрузите нужный диапазон
+   в буфер (load_candles или update_candles), потом вызывайте calculate_static(use_buffer=True).
+   Буфер будет жить до вызова clear_buffer() или до следующего calculate_static(use_buffer=False).
+
+3. Никогда не держите буфер часовых свечей за несколько лет в памяти без необходимости —
+   это десятки тысяч записей и серьёзно жрёт RAM.
+
+Пример правильного использования в кастомном анализе:
+
+candles = MultiTimeframeCandles(figi=bond.figi, factor=bond.nominal/100)
+
+# загружаем только последние 3 года дневок
+await candles[CandleInterval.CANDLE_INTERVAL_DAY].load_candles(
+    from_date=datetime.now() - timedelta(days=3*365)
+)
+
+# считаем метрики по этим 3 годам
+candles.calculate_static(use_buffer=True)
+
+print(f"Volatility за 3 года: {candles.volatility:.2%}")
+print(f"Max drawdown за 3 года: {candles.max_drawdown:.2%}")
+
+# буфер остаётся в памяти, если нужно — очищаем вручную
+# candles[CandleInterval.CANDLE_INTERVAL_DAY].clear_buffer()
+
+Именно так модуль candles и задумывался: максимально гибкий буфер + удобные «автоматические» методы
+для 99% обычных задач.

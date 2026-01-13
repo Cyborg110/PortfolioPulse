@@ -1,0 +1,28 @@
+# Файл с API-ключами
+token.py
+
+# Тяжёлые базы данных
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Виртуальное окружение (независимо от названия)
+env/
+venv/
+.venv/
+.env/
+
+# PyCharm
+.idea/
+
+# Python мусор
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Другое полезное
+*.log
+.DS_Store           # macOS
+Thumbs.db           # Windows
