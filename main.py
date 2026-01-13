@@ -35,8 +35,8 @@ async def short_term():
 
 if __name__ == "__main__":
     # asyncio.run(update())
-    # asyncio.run(best())
-    asyncio.run(short_term())
+    asyncio.run(best())
+    # asyncio.run(short_term())
 
     # from test import candles      # Тестирование свечей
     # from test import payments       # Тестирование выплат

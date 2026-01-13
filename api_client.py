@@ -5,7 +5,7 @@ import requests
 from tinkoff.invest import AsyncClient, RequestError, InstrumentType, GetAssetFundamentalsRequest, MoneyValue
 from bs4 import BeautifulSoup
 
-from token import TOKEN
+from key import TOKEN
 
 
 class TinkoffAPIClient:
