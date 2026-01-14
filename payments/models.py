@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 import numpy as np
 from typing import List, Optional
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 from settings import Settings
 from api_client import tinkoff_api_client

@@ -3,7 +3,7 @@ import asyncio
 from typing import List, Dict
 from datetime import datetime, timedelta
 
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 from settings import Settings
 from base.models import BaseAsset

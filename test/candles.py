@@ -2,7 +2,7 @@
 import asyncio
 
 from datetime import datetime, timedelta
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 from typing import List, Tuple
 from stocks.models import Stock, Stocks
 from bonds.models import Bond, Bonds

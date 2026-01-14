@@ -2,7 +2,7 @@
 from sqlalchemy import Column, Float, DateTime
 from sqlalchemy.sql import text
 from datetime import datetime, timedelta
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 from settings import Settings
 from base.database import BaseCandlesDatabase, BaseCandle

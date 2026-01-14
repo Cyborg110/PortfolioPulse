@@ -2,7 +2,7 @@
 import asyncio
 from typing import List, Dict
 
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 from base.models import BaseAsset
 from commodities.database import commodities_database

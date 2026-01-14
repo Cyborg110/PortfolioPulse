@@ -1,6 +1,6 @@
 # settings.py
 # Токен для подключения к API тинькоф инвестиции
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 
 class Settings:

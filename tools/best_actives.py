@@ -2,7 +2,7 @@
 import logging
 import asyncio
 
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 from stocks.models import Stocks, Stock
 from bonds.models import Bonds, Bond

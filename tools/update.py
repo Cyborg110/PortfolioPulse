@@ -2,7 +2,7 @@
 import logging
 import asyncio
 
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 from api_client import tinkoff_api_client
 from stocks.database import stocks_database, Stock as Stock_db

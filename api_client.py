@@ -2,7 +2,7 @@
 from datetime import datetime
 
 import requests
-from tinkoff.invest import AsyncClient, RequestError, InstrumentType, GetAssetFundamentalsRequest, MoneyValue
+from t_tech.invest import AsyncClient, RequestError, InstrumentType, GetAssetFundamentalsRequest, MoneyValue
 from bs4 import BeautifulSoup
 
 from key import TOKEN

@@ -4,7 +4,7 @@ import numpy as np
 from typing import List, Tuple, Callable, Any
 
 import matplotlib
-matplotlib.use("MacOSX")
+# matplotlib.use("MacOSX")
 
 
 def plot_assets(
@@ -237,16 +237,11 @@ class Selection:
 
     # --- Акции (Stock) ---
     STOCKS: List[Tuple[Callable[[Any], float], Callable[[Any], float], str, str]] = [
-        (lambda s: s.candles.volatility, lambda s: s.candles.average_return * 252,
-         "Волатильность (%)", "Годовая доходность (%)"),
-        (lambda s: s.candles.max_drawdown, lambda s: s.payments.trailing_yield,
-         "Макс. просадка (%)", "Текущая дивидендная доходность (%)"),
-        (lambda s: s.candles.sharpe_ratio, lambda s: s.payments.dividend_cagr_3y,
-         "Коэффициент Шарпа", "CAGR дивидендов 3 года (%)"),
-        (lambda s: s.candles.avg_volume, lambda s: s.payments.yield_plus_growth,
-         "Средний объём", "Доходность + рост"),
-        (lambda s: s.candles.atr_14, lambda s: s.payments.risk_adj_yield,
-         "ATR (14 дней)", "Доходность с учётом риска"),
+        (lambda s: s.candles.volatility, lambda s: s.candles.average_return * 252, "Волатильность (%)", "Годовая доходность (%)"),
+        (lambda s: s.candles.max_drawdown, lambda s: s.payments.trailing_yield, "Макс. просадка (%)", "Текущая дивидендная доходность (%)"),
+        (lambda s: s.candles.sharpe_ratio, lambda s: s.payments.dividend_cagr_3y, "Коэффициент Шарпа", "CAGR дивидендов 3 года (%)"),
+        (lambda s: s.candles.avg_volume, lambda s: s.payments.yield_plus_growth, "Средний объём", "Доходность + рост"),
+        # (lambda s: s.candles.atr_14, lambda s: s.payments.risk_adj_yield, "ATR (14 дней)", "Доходность с учётом риска"),
         # (lambda s: s.candles.rsi, lambda s: s.payments.forward_yield, "RSI", "Прогнозная доходность (%)"),
     ]
 

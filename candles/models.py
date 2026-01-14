@@ -3,7 +3,7 @@ import asyncio
 import numpy as np
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 from settings import Settings
 from api_client import tinkoff_api_client
@@ -198,7 +198,7 @@ class StaticMetrics(CandlesBase):
         :return:
         """
         if len(self.candles) < 2:
-            self.avg_volume = 0.0
+            self.avg_price_volume = 0.0
             return 0.0
 
         self.avg_price_volume = np.mean([c.volume * c.close for c in self.candles])
@@ -626,13 +626,12 @@ class Candles(StaticMetrics, DynamicMetrics):
         width = 25
         return (
             f"Candles                {self.interval.name}\n"
-            f"\t{'Волатильность:':<{width}}{self.volatility:>10.4f}\n"
-            f"\t{'Средний объём:':<{width}}{self.avg_volume:>10.2f}\n"
-            f"\t{'Средний денежный объём:':<{width}}{self.avg_price_volume:>10.2f}\n"
-            f"\t{'Средняя доходность:':<{width}}{self.average_return:>10.4f}\n"
-            f"\t{'Шарп:':<{width}}{self.sharpe_ratio:>10.4f}\n"
-            f"\t{'Макс. просадка:':<{width}}{self.max_drawdown:>10.4f}\n"
-            f"\t{'ATR_14:':<{width}}{getattr(self, 'atr_14', 'N/A'):>10}"
+            f"\t{'Волатильность:':<{width}}{float(self.volatility):>10.4f}\n"
+            f"\t{'Средний объём:':<{width}}{float(self.avg_volume):>10.2f}\n"
+            f"\t{'Средний денежный объём:':<{width}}{float(self.avg_price_volume):>10.2f}\n"
+            f"\t{'Средняя доходность:':<{width}}{float(self.average_return):>10.4f}\n" 
+            f"\t{'Шарп:':<{width}}{float(self.sharpe_ratio):>10.4f}\n"
+            f"\t{'Макс. просадка:':<{width}}{float(self.max_drawdown):>10.4f}\n"
         )
 
 

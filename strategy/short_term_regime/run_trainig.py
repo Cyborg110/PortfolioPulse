@@ -1,5 +1,5 @@
 # strategy/short_term_regime/run_training.py
-from tinkoff.invest import CandleInterval
+from t_tech.invest import CandleInterval
 
 from candles.time_synchronized import TimeSynchronizedContext
 from strategy.short_term_regime.trainer import ShortTermRegimeTrainer, MACRO_FIGI
